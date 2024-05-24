@@ -1,14 +1,20 @@
 {
   "name": "@vyachean/eslint-config",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "linter configuration with strict typescript and vue rules",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vyachean/eslint-config.git"
+  },
   "main": "index.mjs",
   "type": "module",
   "scripts": {},
   "keywords": [
-    "eslint-config"
+    "eslint-config",
+    "eslint",
+    "eslintconfig"
   ],
-  "author": "vyachean@gmail.com",
+  "author": "Vyachean vyachean@gmail.com",
   "license": "ISC",
   "peerDependencies": {
     "eslint": ">= 9"
