@@ -8,10 +8,12 @@ import { createPrettierEslintConfig } from './createPrettierEslintConfig';
 /**
  * Create configuration
  */
-export const createEslintConfig = (options: {
-  vue?: boolean;
-  tsParserOptions?: TSESLint.ParserOptions;
-} = {}): TSESLint.FlatConfig.ConfigArray => {
+export const createEslintConfig = (
+  options: {
+    vue?: boolean;
+    tsParserOptions?: TSESLint.ParserOptions;
+  } = {},
+): TSESLint.FlatConfig.ConfigArray => {
   const { tsParserOptions, vue } = options;
   const config: TSESLint.FlatConfig.ConfigArray = [...javaScriptConfig];
 

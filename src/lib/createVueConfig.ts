@@ -11,26 +11,30 @@ import { createGlobFileList } from './createGlobFileList';
 export const createVueEslintConfig = (
   parserOptions?: TSESLint.ParserOptions,
 ): TSESLint.FlatConfig.ConfigArray => {
-  const languageOptions = parserOptions
-    ? {
-        parser: vueEslintParser,
-        // sourceType: 'module',
-        parserOptions: {
-          parser: typescriptEslint.parser,
-          extraFileExtensions: ['.vue'],
-          ...parserOptions,
-        },
-      }
-    : undefined;
-
   const files = createGlobFileList({ vue: true });
 
-  return typescriptEslint.config(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- eslint-plugin-vue is missing typing
+  const configParserWithTS = parserOptions
+    ? [
+        {
+          files,
+          languageOptions: {
+            parser: vueEslintParser,
+            sourceType: 'module',
+            parserOptions: {
+              parser: typescriptEslint.parser,
+              extraFileExtensions: ['.vue'],
+              ...parserOptions,
+            },
+          },
+        },
+      ]
+    : [];
+
+  return [
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- eslint-plugin-vue is missing typing
     ...eslintPluginVue.configs['flat/recommended'],
+    ...configParserWithTS,
     {
-      files,
-      languageOptions,
       rules: {
         'vue/max-attributes-per-line': 'error',
         'vue/no-unused-components':
@@ -163,5 +167,5 @@ export const createVueEslintConfig = (
           process.env.NODE_ENV !== 'production' ? 'warn' : 'error',
       },
     },
-  );
+  ] as const;
 };

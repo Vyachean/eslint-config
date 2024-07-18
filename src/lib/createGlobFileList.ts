@@ -5,8 +5,14 @@ export const GLOB_VUE = 'vue';
 /**
  * Generate a list of scanned files
  */
-export const createGlobFileList = ({ vue, ts, js }: {
-  vue?: boolean, ts?: boolean, js?: boolean
+export const createGlobFileList = ({
+  vue,
+  ts,
+  js,
+}: {
+  vue?: boolean;
+  ts?: boolean;
+  js?: boolean;
 } = {}): string[] => {
   const globFilesList = [];
   if (js) {
