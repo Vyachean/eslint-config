@@ -4,13 +4,14 @@ export const GLOB_VUE = 'vue';
 
 /**
  * Generate a list of scanned files
- * @param {object} [options]
- * @param {boolean} [options.ts] include .ts files
- * @param {boolean} [options.vue] include .vue files
- * @returns {string[]}
  */
-export const createGlobFileList = ({ vue, ts } = {}) => {
-  const globFilesList = [GLOB_JS];
+export const createGlobFileList = ({ vue, ts, js }: {
+  vue?: boolean, ts?: boolean, js?: boolean
+} = {}): string[] => {
+  const globFilesList = [];
+  if (js) {
+    globFilesList.push(GLOB_JS);
+  }
   if (ts) {
     globFilesList.push(GLOB_TS);
   }

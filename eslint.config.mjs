@@ -1,3 +1,9 @@
-import { config } from './index.mjs';
+import { config } from './dist/index.js';
 
-export default [...config()];
+export default [
+  ...config({
+    tsParserOptions: {
+      EXPERIMENTAL_useProjectService: true,
+    },
+  }),
+];

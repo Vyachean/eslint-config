@@ -25,7 +25,13 @@ const tsConfigPath = resolve(
 
 export default [
   ...config({
-    tsConfigPath,
+    // parserOptions for ts
+    tsParserOptions: {
+      project: tsConfigPath,
+
+      // recommended for ts files, but doesn't work with vue yet
+      EXPERIMENTAL_useProjectService: true,
+    },
     vue: true, // to support vue files
   })
   // define rules

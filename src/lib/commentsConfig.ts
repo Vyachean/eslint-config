@@ -1,6 +1,8 @@
+// @ts-expect-error
 import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
+import type { TSESLint } from '@typescript-eslint/utils';
 
-export const commentsConfig = [
+export const commentsConfig: TSESLint.FlatConfig.ConfigArray = [
   comments.recommended,
   {
     rules: {

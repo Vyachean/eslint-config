@@ -1,20 +1,18 @@
 import typescriptEslint from 'typescript-eslint';
-import { TSESLint } from '@typescript-eslint/utils';
-import { createGlobFileList } from './createGlobFileList.mjs';
+import type { TSESLint } from '@typescript-eslint/utils';
+import { createGlobFileList } from './createGlobFileList';
 
 /**
  * Create configuration for TS
- * @param {string} project -- absolute path to the tsconfig.json file
- * @returns {TSESLint.FlatConfig.ConfigArray}
  */
-export const createTypeScriptEslintConfig = (project) =>
+export const createTypeScriptEslintConfig = (
+  parserOptions?: TSESLint.ParserOptions,
+): TSESLint.FlatConfig.Config[] =>
   typescriptEslint.config(
     ...typescriptEslint.configs.strictTypeChecked,
     {
       languageOptions: {
-        parserOptions: {
-          project,
-        },
+        parserOptions,
       },
       rules: {
         'no-undef': 'off',

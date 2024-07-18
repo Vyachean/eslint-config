@@ -1,29 +1,35 @@
-import { TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 import typescriptEslint from 'typescript-eslint';
-import eslintPluginVue from 'eslint-plugin-vue';
 import vueEslintParser from 'vue-eslint-parser';
+// @ts-expect-error -- eslint-plugin-vue is missing typing
+import eslintPluginVue from 'eslint-plugin-vue';
+import { createGlobFileList } from './createGlobFileList';
 
 /**
  * Create configuration for vue
- * @param {string} [project] absolute path to the tsconfig.json file
- * @returns {TSESLint.FlatConfig.ConfigArray}
  */
-export const createVueEslintConfig = (project) => {
-  const includeTs = typeof project === 'string';
-  const languageOptions = includeTs
+export const createVueEslintConfig = (
+  parserOptions?: TSESLint.ParserOptions,
+): TSESLint.FlatConfig.ConfigArray => {
+  const languageOptions = parserOptions
     ? {
         parser: vueEslintParser,
-        sourceType: 'module',
+        // sourceType: 'module',
         parserOptions: {
           parser: typescriptEslint.parser,
-          project,
           extraFileExtensions: ['.vue'],
+          ...parserOptions,
         },
       }
     : undefined;
+
+  const files = createGlobFileList({ vue: true });
+
   return typescriptEslint.config(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- eslint-plugin-vue is missing typing
     ...eslintPluginVue.configs['flat/recommended'],
     {
+      files,
       languageOptions,
       rules: {
         'vue/max-attributes-per-line': 'error',
