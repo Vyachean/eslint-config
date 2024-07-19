@@ -9,11 +9,11 @@ import { createGlobFileList } from './createGlobFileList';
  * Create configuration for vue
  */
 export const createVueEslintConfig = (
-  parserOptions?: TSESLint.ParserOptions,
+  tsParserOptions?: TSESLint.ParserOptions,
 ): TSESLint.FlatConfig.ConfigArray => {
   const files = createGlobFileList({ vue: true });
 
-  const configParserWithTS = parserOptions
+  const configParserWithTS = tsParserOptions
     ? [
         {
           files,
@@ -23,7 +23,7 @@ export const createVueEslintConfig = (
             parserOptions: {
               parser: typescriptEslint.parser,
               extraFileExtensions: ['.vue'],
-              ...parserOptions,
+              ...tsParserOptions,
             },
           },
         },
