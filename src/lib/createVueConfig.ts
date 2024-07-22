@@ -27,10 +27,16 @@ export const createVueEslintConfig = (
             },
           },
         },
+        {
+          rules: {
+            // [no-unsafe-*] doesn't work with vue files https://github.com/vuejs/vue-eslint-parser/issues/104
+            '@typescript-eslint/no-unsafe-argument': 'off',
+          },
+        },
       ]
     : [];
 
-  return [
+  const config: TSESLint.FlatConfig.ConfigArray = [
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- eslint-plugin-vue is missing typing
     ...eslintPluginVue.configs['flat/recommended'],
     ...configParserWithTS,
@@ -168,4 +174,16 @@ export const createVueEslintConfig = (
       },
     },
   ] as const;
+
+  config.forEach(({ languageOptions }) => {
+    if (
+      languageOptions &&
+      'parser' in languageOptions &&
+      languageOptions.parser === undefined
+    ) {
+      delete languageOptions.parser;
+    }
+  });
+
+  return config;
 };

@@ -23,7 +23,7 @@ export const createEslintConfig = (
   if (vue) {
     config.push(...createVueEslintConfig(tsParserOptions));
   }
-  config.push(...commentsConfig, ...createPrettierEslintConfig());
+  config.push(...commentsConfig, ...createPrettierEslintConfig({ vue }));
 
   return config;
 };
