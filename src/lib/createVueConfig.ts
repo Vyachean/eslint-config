@@ -1,7 +1,6 @@
 import type { TSESLint } from '@typescript-eslint/utils';
 import typescriptEslint from 'typescript-eslint';
 import vueEslintParser from 'vue-eslint-parser';
-// @ts-expect-error -- eslint-plugin-vue is missing typing
 import eslintPluginVue from 'eslint-plugin-vue';
 import { createGlobFileList } from './createGlobFileList';
 
