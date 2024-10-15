@@ -25,7 +25,6 @@ export const createTypeScriptEslintConfig = (
       '@typescript-eslint/no-unused-vars':
         process.env.NODE_ENV !== 'production' ? 'warn' : 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/ban-types': 'error',
       '@typescript-eslint/consistent-type-imports': 'warn',
       '@typescript-eslint/restrict-template-expressions': [
         'error',

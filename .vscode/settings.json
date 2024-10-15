@@ -2,5 +2,6 @@
   "todo-tree.regex.regexCaseSensitive": false,
   "cSpell.words": [
     "TSES"
-  ]
+  ],
+  "eslint.format.enable": true
 }
