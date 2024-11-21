@@ -1,7 +1,9 @@
 {
   "todo-tree.regex.regexCaseSensitive": false,
   "cSpell.words": [
-    "TSES"
+    "TSES",
+    "Vyachean"
   ],
-  "eslint.format.enable": true
+  "eslint.format.enable": true,
+  "cSpell.language": "en,ru"
 }
