@@ -91,7 +91,8 @@ export const createVueEslintConfig = (
       'vue/no-duplicate-attr-inheritance': 'error',
       'vue/no-empty-component-block': 'warn',
       'vue/no-multiple-objects-in-class': 'warn',
-      'vue/no-ref-object-reactivity-loss': 'warn', // сменить на error
+      'vue/no-ref-object-reactivity-loss':
+        process.env.NODE_ENV !== 'production' ? 'warn' : 'error',
       'vue/no-root-v-if': 'error',
       'vue/no-setup-props-reactivity-loss': 'error',
       'vue/no-static-inline-styles': 'error',
@@ -172,6 +173,9 @@ export const createVueEslintConfig = (
       // rules has not been released yet
       'vue/require-explicit-slots':
         process.env.NODE_ENV !== 'production' ? 'warn' : 'error',
+
+      // for correct rename symbols
+      'vue/v-bind-style': ['warn', 'shorthand', { sameNameShorthand: 'never' }],
     },
   });
 

@@ -1,9 +1,9 @@
 {
+  "npm.packageManager": "pnpm",
   "todo-tree.regex.regexCaseSensitive": false,
-  "cSpell.words": [
-    "TSES",
-    "Vyachean"
-  ],
+  "cSpell.words": ["TSES", "Vyachean"],
   "eslint.format.enable": true,
+  "eslint.useFlatConfig": true,
+  "editor.formatOnSave": true,
   "cSpell.language": "en,ru"
 }
