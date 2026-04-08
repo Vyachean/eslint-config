@@ -2,9 +2,7 @@ import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
 import type { Linter } from 'eslint';
 import { resolveRuleLevel } from './resolveRuleLevel';
 
-export const createCommentsConfig = (
-  production: boolean,
-): Linter.Config[] => {
+export const createCommentsConfig = (production: boolean): Linter.Config[] => {
   const ruleLevel = resolveRuleLevel(production);
 
   return [

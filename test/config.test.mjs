@@ -26,7 +26,12 @@ const createProject = async (files) => {
   return cwd;
 };
 
-const lintPaths = async ({ cwd, filePaths, options, configFactory = jsConfig }) => {
+const lintPaths = async ({
+  cwd,
+  filePaths,
+  options,
+  configFactory = jsConfig,
+}) => {
   const eslint = new ESLint({
     cwd,
     overrideConfigFile: true,
@@ -107,7 +112,7 @@ test('includes eslint recommended rules for javascript', async (t) => {
   assert.equal(findRule(messages, 'no-undef')?.severity, 2);
 });
 
-test('does not force a custom prettier quote style', async (t) => {
+test('enforces single quotes through prettier', async (t) => {
   const cwd = await createProject({
     'index.js': 'const message = "hello";\nexport { message };\n',
   });
@@ -119,7 +124,7 @@ test('does not force a custom prettier quote style', async (t) => {
     options: { production: true },
   });
 
-  assert.equal(findRule(messages, 'prettier/prettier'), undefined);
+  assert.equal(findRule(messages, 'prettier/prettier')?.severity, 1);
 });
 
 test('supports typescript without type-aware parser options', async (t) => {
@@ -337,7 +342,7 @@ test('supports vue production mode for production builds', async (t) => {
 
 test('keeps vue formatting rules compatible with prettier', async (t) => {
   const cwd = await createProject({
-    'Component.vue': `<template><div class=\"a\" id=\"b\">{{ value }}</div></template>\n<script setup>\nconst value = 'hello'\n</script>\n`,
+    'Component.vue': `<template><div class="a" id="b">{{ value }}</div></template>\n<script setup>\nconst value = 'hello'\n</script>\n`,
   });
   t.after(() => rm(cwd, { recursive: true, force: true }));
 

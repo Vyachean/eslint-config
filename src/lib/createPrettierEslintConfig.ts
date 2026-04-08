@@ -12,14 +12,11 @@ export const createPrettierEslintConfig = ({
   const config: Linter.Config[] = [];
 
   if (includeBase) {
-    config.push(
-      eslintPluginPrettierRecommended,
-      {
-        rules: {
-          'prettier/prettier': 'warn',
-        },
+    config.push(eslintPluginPrettierRecommended, {
+      rules: {
+        'prettier/prettier': ['warn', { singleQuote: true }],
       },
-    );
+    });
   }
 
   if (vue) {

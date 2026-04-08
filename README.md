@@ -100,6 +100,8 @@ export default [
 - `@vyachean/eslint-config/vue`: JavaScript base config plus Vue 3 rules and Vue-specific Prettier compatibility.
 - `@vyachean/eslint-config/vue-typescript`: JavaScript base config plus Vue 3 and TypeScript rules together.
 
+Prettier integration uses `singleQuote: true`.
+
 ## Options
 
 Base options for all entry points:
@@ -122,3 +124,13 @@ Additional options:
 - Vue + TypeScript production builds: `config({ production: true, tsParserOptions: { ... } })`
 
 The config imports ignore patterns from the current project's `.gitignore` when that file exists and always ignores `dist`.
+
+## Project checks
+
+For this repository itself:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm check
+```

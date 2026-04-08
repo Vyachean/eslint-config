@@ -1,5 +1,8 @@
 import type { Linter } from 'eslint';
-import { createEslintConfig, type CreateEslintConfigOptions } from './lib/createEslintConfig';
+import {
+  createEslintConfig,
+  type CreateEslintConfigOptions,
+} from './lib/createEslintConfig';
 import { createPrettierEslintConfig } from './lib/createPrettierEslintConfig';
 import { createVueEslintConfig } from './lib/createVueConfig';
 

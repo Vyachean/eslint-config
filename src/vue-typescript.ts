@@ -1,12 +1,14 @@
 import type { Linter } from 'eslint';
-import { createEslintConfig, type CreateEslintConfigOptions } from './lib/createEslintConfig';
+import {
+  createEslintConfig,
+  type CreateEslintConfigOptions,
+} from './lib/createEslintConfig';
 import { createTypeScriptEslintConfig } from './lib/createTypeScriptEslintConfig';
 import { createPrettierEslintConfig } from './lib/createPrettierEslintConfig';
 import { createVueEslintConfig } from './lib/createVueConfig';
 import { createGlobFileList } from './lib/createGlobFileList';
 
-export interface CreateVueTypeScriptEslintConfigOptions
-  extends CreateEslintConfigOptions {
+export interface CreateVueTypeScriptEslintConfigOptions extends CreateEslintConfigOptions {
   tsParserOptions?: Record<string, unknown>;
 }
 

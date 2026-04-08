@@ -12,4 +12,12 @@ export default [
       tsconfigRootDir: currentDirectory,
     },
   }),
+  {
+    files: ['eslint.config.mjs', 'test/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+      },
+    },
+  },
 ];

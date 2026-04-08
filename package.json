@@ -37,6 +37,10 @@
   },
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prelint": "npm run build",
+    "lint": "eslint . --fix",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
     "prepare": "npm run build",
     "pretest": "npm run build",
     "test": "node --test test/*.test.mjs",
