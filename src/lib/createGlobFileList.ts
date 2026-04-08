@@ -14,7 +14,7 @@ export const createGlobFileList = ({
   ts?: boolean;
   js?: boolean;
 } = {}): string[] => {
-  const globFilesList = [];
+  const globFilesList: string[] = [];
   if (js) {
     globFilesList.push(GLOB_JS);
   }
@@ -24,7 +24,16 @@ export const createGlobFileList = ({
   if (vue) {
     globFilesList.push(GLOB_VUE);
   }
-  const globFiles = `*.${globFilesList.join(',')}`;
+
+  if (globFilesList.length === 0) {
+    return [];
+  }
+
+  const extensionGroup =
+    globFilesList.length === 1
+      ? globFilesList[0]
+      : `{${globFilesList.join(',')}}`;
+  const globFiles = `*.${extensionGroup}`;
 
   const files = [globFiles, `**/${globFiles}`];
 

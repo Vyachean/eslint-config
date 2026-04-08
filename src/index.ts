@@ -5,3 +5,4 @@ export {
   GLOB_VUE,
 } from './lib/createGlobFileList';
 export { createEslintConfig as config } from './lib/createEslintConfig';
+export type { CreateEslintConfigOptions } from './lib/createEslintConfig';
