@@ -4,6 +4,7 @@ import eslintPluginVue from 'eslint-plugin-vue';
 import { createGlobFileList } from './createGlobFileList';
 import type { Linter } from 'eslint';
 import { resolveRuleLevel } from './resolveRuleLevel';
+import { createVueTypeScriptParserOptions } from './createVueTypeScriptParserOptions';
 
 export const createVueEslintConfig = ({
   production,
@@ -32,8 +33,7 @@ export const createVueEslintConfig = ({
           sourceType: 'module',
           parserOptions: {
             parser: typescriptEslint.parser,
-            extraFileExtensions: ['.vue'],
-            ...tsParserOptions,
+            ...createVueTypeScriptParserOptions(tsParserOptions),
           },
         },
       },

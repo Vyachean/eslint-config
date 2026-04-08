@@ -354,10 +354,22 @@ test('keeps vue formatting rules compatible with prettier', async (t) => {
   });
 
   assert.equal(findRule(messages, 'vue/max-attributes-per-line'), undefined);
-  assert.equal(findRule(messages, 'vue/html-closing-bracket-newline'), undefined);
-  assert.equal(findRule(messages, 'vue/html-closing-bracket-spacing'), undefined);
-  assert.equal(findRule(messages, 'vue/html-comment-content-newline'), undefined);
-  assert.equal(findRule(messages, 'vue/html-comment-content-spacing'), undefined);
+  assert.equal(
+    findRule(messages, 'vue/html-closing-bracket-newline'),
+    undefined,
+  );
+  assert.equal(
+    findRule(messages, 'vue/html-closing-bracket-spacing'),
+    undefined,
+  );
+  assert.equal(
+    findRule(messages, 'vue/html-comment-content-newline'),
+    undefined,
+  );
+  assert.equal(
+    findRule(messages, 'vue/html-comment-content-spacing'),
+    undefined,
+  );
   assert.equal(findRule(messages, 'vue/html-comment-indent'), undefined);
   assert.equal(findRule(messages, 'vue/html-indent'), undefined);
   assert.equal(findRule(messages, 'vue/html-quotes'), undefined);
@@ -365,15 +377,24 @@ test('keeps vue formatting rules compatible with prettier', async (t) => {
     findRule(messages, 'vue/multiline-html-element-content-newline'),
     undefined,
   );
-  assert.equal(findRule(messages, 'vue/mustache-interpolation-spacing'), undefined);
+  assert.equal(
+    findRule(messages, 'vue/mustache-interpolation-spacing'),
+    undefined,
+  );
   assert.equal(findRule(messages, 'vue/no-multi-spaces'), undefined);
   assert.equal(
     findRule(messages, 'vue/no-spaces-around-equal-signs-in-attribute'),
     undefined,
   );
   assert.equal(findRule(messages, 'vue/padding-line-between-tags'), undefined);
-  assert.equal(findRule(messages, 'vue/padding-lines-in-component-definition'), undefined);
-  assert.equal(findRule(messages, 'vue/singleline-html-element-content-newline'), undefined);
+  assert.equal(
+    findRule(messages, 'vue/padding-lines-in-component-definition'),
+    undefined,
+  );
+  assert.equal(
+    findRule(messages, 'vue/singleline-html-element-content-newline'),
+    undefined,
+  );
 });
 
 test('supports vue with typescript', async (t) => {
@@ -447,6 +468,44 @@ test('applies typescript assertion rules inside vue script setup', async (t) => 
 
   assert.equal(
     findRule(messages, '@typescript-eslint/consistent-type-assertions')
+      ?.severity,
+    2,
+  );
+});
+
+test('supports type-aware typescript rules inside vue script setup', async (t) => {
+  const cwd = await createProject({
+    'tsconfig.json': JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          strict: true,
+        },
+        include: ['**/*.ts', '**/*.vue'],
+      },
+      null,
+      2,
+    ),
+    'Component.vue': `<script setup lang="ts">\nconst flag = true;\nconst label = \`\${flag}\`;\n</script>\n\n<template>\n  <div>{{ label }}</div>\n</template>\n`,
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'Component.vue',
+    options: {
+      production: true,
+      tsParserOptions: {
+        projectService: true,
+        tsconfigRootDir: cwd,
+      },
+    },
+    configFactory: vueTypeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/restrict-template-expressions')
       ?.severity,
     2,
   );

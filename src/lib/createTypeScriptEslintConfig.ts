@@ -7,10 +7,12 @@ export const createTypeScriptEslintConfig = ({
   files,
   parserOptions,
   production,
+  transformConfig,
 }: {
   files?: string[];
   parserOptions?: Record<string, unknown>;
   production: boolean;
+  transformConfig?: (config: Linter.Config) => Linter.Config;
 }): Linter.Config[] => {
   const ruleLevel = resolveRuleLevel(production);
   const isTypeAware = parserOptions !== undefined;
@@ -24,6 +26,9 @@ export const createTypeScriptEslintConfig = ({
       ? typescriptEslint.configs.strict
       : typescriptEslint.configs.recommended;
 
+  const applyTransform = (config: Linter.Config): Linter.Config =>
+    transformConfig ? transformConfig(config) : config;
+
   const config: Linter.Config[] = [
     ...baseConfig.map((config) => {
       const existingFiles =
@@ -33,12 +38,12 @@ export const createTypeScriptEslintConfig = ({
             )
           : [];
 
-      return {
+      return applyTransform({
         ...config,
         files: [...new Set([...existingFiles, ...targetFiles])],
-      };
+      });
     }),
-    {
+    applyTransform({
       files: targetFiles,
       ...(parserOptions
         ? {
@@ -83,14 +88,16 @@ export const createTypeScriptEslintConfig = ({
             }
           : {}),
       },
-    },
+    }),
   ];
 
   if (isTypeAware) {
-    config.push({
-      ...typescriptEslint.configs.disableTypeChecked,
-      files: createGlobFileList({ js: true }),
-    });
+    config.push(
+      applyTransform({
+        ...typescriptEslint.configs.disableTypeChecked,
+        files: createGlobFileList({ js: true }),
+      }),
+    );
   }
 
   return config;
