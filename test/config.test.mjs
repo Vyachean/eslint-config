@@ -227,6 +227,46 @@ test('supports type-aware typescript rules in relaxed mode', async (t) => {
   );
 });
 
+test('requires initializing typed variables in typescript', async (t) => {
+  const cwd = await createProject({
+    'index.ts': 'let result: string;\nresult = "done";\nexport { result };\n',
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'index.ts',
+    options: { production: true },
+    configFactory: typeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/init-declarations')?.severity,
+    2,
+  );
+  assert.equal(findRule(messages, 'init-declarations'), undefined);
+});
+
+test('forbids type assertions in typescript', async (t) => {
+  const cwd = await createProject({
+    'index.ts': 'const value = "hello" as string;\nexport { value };\n',
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'index.ts',
+    options: { production: true },
+    configFactory: typeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/consistent-type-assertions')
+      ?.severity,
+    2,
+  );
+});
+
 test('does not apply typescript-only rules to javascript sidecar files', async (t) => {
   const cwd = await createProject({
     'build.js': "const fs = require('node:fs');\nmodule.exports = fs;\n",
@@ -346,6 +386,44 @@ test('supports vue with typescript', async (t) => {
   assert.equal(
     findRule(messages, '@typescript-eslint/no-explicit-any')?.severity,
     1,
+  );
+});
+
+test('applies typescript assertion rules inside vue script setup', async (t) => {
+  const cwd = await createProject({
+    'tsconfig.json': JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          strict: true,
+        },
+        include: ['**/*.ts', '**/*.vue'],
+      },
+      null,
+      2,
+    ),
+    'Component.vue': `<script setup lang="ts">\nconst value = "hello" as string;\n</script>\n\n<template>\n  <div>{{ value }}</div>\n</template>\n`,
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'Component.vue',
+    options: {
+      production: true,
+      tsParserOptions: {
+        projectService: true,
+        tsconfigRootDir: cwd,
+      },
+    },
+    configFactory: vueTypeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/consistent-type-assertions')
+      ?.severity,
+    2,
   );
 });
 

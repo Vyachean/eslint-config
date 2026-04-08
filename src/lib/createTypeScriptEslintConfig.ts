@@ -50,15 +50,23 @@ export const createTypeScriptEslintConfig = ({
       rules: {
         'no-undef': 'off',
         'no-empty-function': 'off',
+        'init-declarations': 'off',
         '@typescript-eslint/no-empty-function': [
           'warn',
           {
             allow: ['overrideMethods'],
           },
         ],
+        '@typescript-eslint/init-declarations': 'error',
         '@typescript-eslint/no-unused-vars': ruleLevel,
         '@typescript-eslint/no-explicit-any': 'warn',
         '@typescript-eslint/consistent-type-imports': 'warn',
+        '@typescript-eslint/consistent-type-assertions': [
+          'error',
+          {
+            assertionStyle: 'never',
+          },
+        ],
         ...(isTypeAware
           ? {
               '@typescript-eslint/restrict-template-expressions': [
