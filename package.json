@@ -1,15 +1,50 @@
 {
   "name": "@vyachean/eslint-config",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "linter configuration with strict typescript and vue rules",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vyachean/eslint-config.git"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "README.ru.md"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./typescript": {
+      "types": "./dist/typescript.d.ts",
+      "require": "./dist/typescript.js",
+      "default": "./dist/typescript.js"
+    },
+    "./vue": {
+      "types": "./dist/vue.d.ts",
+      "require": "./dist/vue.js",
+      "default": "./dist/vue.js"
+    },
+    "./vue-typescript": {
+      "types": "./dist/vue-typescript.d.ts",
+      "require": "./dist/vue-typescript.js",
+      "default": "./dist/vue-typescript.js"
+    }
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prelint": "npm run build",
+    "lint": "eslint . --fix",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "prepare": "npm run build",
+    "pretest": "npm run build",
+    "test": "node --test test/*.test.mjs",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "eslint-config",
@@ -19,19 +54,41 @@
   "author": "Vyachean vyachean@gmail.com",
   "license": "ISC",
   "peerDependencies": {
-    "eslint": "^9.12.0"
+    "eslint": "^9.12.0 || ^10.0.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "typescript": "^5.8.0 || ^6.0.0",
+    "typescript-eslint": "^8.58.1",
+    "vue-eslint-parser": "^10.4.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint-plugin-vue": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    },
+    "typescript-eslint": {
+      "optional": true
+    },
+    "vue-eslint-parser": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.5.1",
-    "eslint-plugin-vue": "^10.3.0",
-    "prettier": "^3.6.2",
-    "typescript-eslint": "^8.35.1"
+    "@eslint/js": "^10.0.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
+    "@eslint/compat": "^2.0.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1"
   },
   "devDependencies": {
-    "@types/node": "^22.16.0",
-    "typescript": "^5.8.3"
+    "@types/node": "^25.5.2",
+    "eslint": "^10.2.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.1",
+    "vue-eslint-parser": "^10.4.0"
   },
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
 }

@@ -1,29 +1,47 @@
-import { createTypeScriptEslintConfig } from './createTypeScriptEslintConfig';
-import { createVueEslintConfig } from './createVueConfig';
-import { javaScriptConfig } from './javaScriptConfig';
-import type { TSESLint } from '@typescript-eslint/utils';
-import { commentsConfig } from './commentsConfig';
+import { includeIgnoreFile } from '@eslint/compat';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { createJavaScriptConfig } from './javaScriptConfig';
+import type { Linter } from 'eslint';
+import { createCommentsConfig } from './commentsConfig';
 import { createPrettierEslintConfig } from './createPrettierEslintConfig';
 
-/**
- * Create configuration
- */
-export const createEslintConfig = (
-  options: {
-    vue?: boolean;
-    tsParserOptions?: TSESLint.ParserOptions;
-  } = {},
-): TSESLint.FlatConfig.ConfigArray => {
-  const { tsParserOptions, vue } = options;
-  const config: TSESLint.FlatConfig.ConfigArray = [...javaScriptConfig];
+const createIgnoreConfig = (): Linter.Config[] => {
+  const gitignorePath = resolve(process.cwd(), '.gitignore');
+  const ignoreConfig: Linter.Config[] = [
+    {
+      ignores: ['**/dist/**'],
+    },
+  ];
 
-  if (tsParserOptions) {
-    config.push(...createTypeScriptEslintConfig(tsParserOptions));
+  if (existsSync(gitignorePath)) {
+    ignoreConfig.unshift(
+      includeIgnoreFile(gitignorePath, 'Imported .gitignore patterns'),
+    );
   }
-  if (vue) {
-    config.push(...createVueEslintConfig(tsParserOptions));
-  }
-  config.push(...commentsConfig, ...createPrettierEslintConfig({ vue }));
+
+  return ignoreConfig;
+};
+
+export interface CreateEslintConfigOptions {
+  production?: boolean;
+  /**
+   * @deprecated Use `production` instead.
+   */
+  strict?: boolean;
+}
+
+export const createEslintConfig = (
+  options: CreateEslintConfigOptions = {},
+): Linter.Config[] => {
+  const { production: productionOption, strict } = options;
+  const production = productionOption ?? strict ?? true;
+  const config: Linter.Config[] = [
+    ...createIgnoreConfig(),
+    ...createJavaScriptConfig(production),
+    ...createCommentsConfig(production),
+    ...createPrettierEslintConfig(),
+  ];
 
   return config;
 };
