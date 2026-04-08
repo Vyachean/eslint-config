@@ -1,6 +1,6 @@
 {
   "name": "@vyachean/eslint-config",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "linter configuration with strict typescript and vue rules",
   "repository": {
     "type": "git",
@@ -75,19 +75,21 @@
     }
   },
   "dependencies": {
-    "@eslint/js": "^10.0.0",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
     "@eslint/compat": "^2.0.5",
+    "@eslint/js": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
+    "@vue/typescript-plugin": "^3.2.6",
     "eslint": "^10.2.0",
     "eslint-plugin-vue": "^10.8.0",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.1",
+    "vue": "^3.5.32",
     "vue-eslint-parser": "^10.4.0"
   },
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"

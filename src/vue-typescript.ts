@@ -10,6 +10,7 @@ import { createGlobFileList } from './lib/createGlobFileList';
 import typescriptEslint from 'typescript-eslint';
 import vueEslintParser from 'vue-eslint-parser';
 import { createVueTypeScriptParserOptions } from './lib/createVueTypeScriptParserOptions';
+import { createVueTypeScriptProjectServiceOptions } from './lib/createVueTypeScriptProjectServiceOptions';
 
 export interface CreateVueTypeScriptEslintConfigOptions extends CreateEslintConfigOptions {
   tsParserOptions?: Record<string, unknown>;
@@ -23,6 +24,8 @@ export const config = (
 ): Linter.Config[] => {
   const { production: productionOption, strict, tsParserOptions } = options;
   const production = productionOption ?? strict ?? true;
+  const vueTypeScriptParserOptions =
+    createVueTypeScriptProjectServiceOptions(tsParserOptions);
 
   return [
     ...createEslintConfig({ production }),
@@ -31,14 +34,16 @@ export const config = (
         ts: true,
       }),
       production,
-      parserOptions: tsParserOptions,
+      parserOptions: vueTypeScriptParserOptions,
     }),
     ...createTypeScriptEslintConfig({
       files: createGlobFileList({
         vue: true,
       }),
       production,
-      parserOptions: createVueTypeScriptParserOptions(tsParserOptions),
+      parserOptions: createVueTypeScriptParserOptions(
+        vueTypeScriptParserOptions,
+      ),
       transformConfig: (config) => {
         const existingLanguageOptions = config.languageOptions ?? {};
         const parser =
@@ -60,7 +65,7 @@ export const config = (
             sourceType: 'module',
             parserOptions: createVueTypeScriptParserOptions({
               ...existingParserOptions,
-              ...tsParserOptions,
+              ...vueTypeScriptParserOptions,
               parser,
             }),
           },
@@ -70,7 +75,7 @@ export const config = (
     ...createVueEslintConfig({
       production,
       ts: true,
-      tsParserOptions,
+      tsParserOptions: vueTypeScriptParserOptions,
     }),
     ...createPrettierEslintConfig({ includeBase: false, vue: true }),
   ];

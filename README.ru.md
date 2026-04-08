@@ -29,11 +29,11 @@ npm i -D typescript typescript-eslint eslint-plugin-vue vue-eslint-parser
 
 ```mjs
 // eslint.config.mjs
-import { config } from '@vyachean/eslint-config';
+import { config } from "@vyachean/eslint-config";
 
 export default [
   ...config({
-    production: process.env.NODE_ENV === 'production',
+    production: process.env.NODE_ENV === "production",
   }),
 ];
 ```
@@ -42,15 +42,15 @@ export default [
 
 ```mjs
 // eslint.config.mjs
-import { config } from '@vyachean/eslint-config/typescript';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { config } from "@vyachean/eslint-config/typescript";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 
 export default [
   ...config({
-    production: process.env.NODE_ENV === 'production',
+    production: process.env.NODE_ENV === "production",
     tsParserOptions: {
       projectService: true,
       tsconfigRootDir: currentDirectory,
@@ -59,15 +59,43 @@ export default [
 ];
 ```
 
+Для лучшего type-aware ESLint в Vue-проектах установите `@vue/typescript-plugin` и включите его в `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "plugins": [{ "name": "@vue/typescript-plugin" }]
+  }
+}
+```
+
+Когда `vue-typescript` используется вместе с `projectService`, конфиг теперь автоматически включает загрузку TypeScript plugins для ESLint. Благодаря этому `.ts`-файлы с импортами `.vue` сохраняют реальные типы компонентов вместо деградации в unsafe values.
+
+Если проект не использует Vue TypeScript plugin, оставляйте локальный declaration в `src/env.d.ts` как fallback:
+
+```ts
+declare module "*.vue" {
+  import type { DefineComponent } from "vue";
+  const component: DefineComponent<
+    Record<string, never>,
+    Record<string, never>,
+    unknown
+  >;
+  export default component;
+}
+```
+
+`extraFileExtensions: ['.vue']` помогает ESLint парсить Vue SFC, но сам по себе не заменяет стандартный TypeScript module resolution для импортов из обычных `.ts`-файлов.
+
 ### Vue
 
 ```mjs
 // eslint.config.mjs
-import { config } from '@vyachean/eslint-config/vue';
+import { config } from "@vyachean/eslint-config/vue";
 
 export default [
   ...config({
-    production: process.env.NODE_ENV === 'production',
+    production: process.env.NODE_ENV === "production",
   }),
 ];
 ```
@@ -76,15 +104,15 @@ export default [
 
 ```mjs
 // eslint.config.mjs
-import { config } from '@vyachean/eslint-config/vue-typescript';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { config } from "@vyachean/eslint-config/vue-typescript";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 
 export default [
   ...config({
-    production: process.env.NODE_ENV === 'production',
+    production: process.env.NODE_ENV === "production",
     tsParserOptions: {
       projectService: true,
       tsconfigRootDir: currentDirectory,
@@ -120,5 +148,7 @@ export default [
 - Vue для локальной разработки: `config({ production: false })`
 - Vue для production-сборки: `config({ production: true })`
 - Vue + TypeScript для production-сборки: `config({ production: true, tsParserOptions: { ... } })`
+
+Для Vue + TypeScript проектов оставляйте локальный declaration для `*.vue` в `.d.ts`, который включён в `tsconfig`.
 
 Если в проекте есть `.gitignore`, конфиг импортирует из него ignore-паттерны и всегда игнорирует `dist`.

@@ -25,27 +25,17 @@ export const createVueEslintConfig = ({
   ];
 
   if (ts) {
-    config.push(
-      {
-        files,
-        languageOptions: {
-          parser: vueEslintParser,
-          sourceType: 'module',
-          parserOptions: {
-            parser: typescriptEslint.parser,
-            ...createVueTypeScriptParserOptions(tsParserOptions),
-          },
+    config.push({
+      files,
+      languageOptions: {
+        parser: vueEslintParser,
+        sourceType: 'module',
+        parserOptions: {
+          parser: typescriptEslint.parser,
+          ...createVueTypeScriptParserOptions(tsParserOptions),
         },
       },
-      {
-        files,
-        rules: {
-          // [no-unsafe-*] doesn't work with vue files https://github.com/vuejs/vue-eslint-parser/issues/104
-          '@typescript-eslint/no-unsafe-argument': 'off',
-          '@typescript-eslint/no-unsafe-assignment': 'off',
-        },
-      },
-    );
+    });
   }
 
   config.push({

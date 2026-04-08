@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { createRequire } from 'node:module';
+import { spawn } from 'node:child_process';
 
 const require = createRequire(import.meta.url);
 const { ESLint } = require('eslint');
@@ -54,6 +55,32 @@ const lintFile = async ({ cwd, filePath, options, configFactory }) => {
 
 const findRule = (messages, ruleId) =>
   messages.find((message) => message.ruleId === ruleId);
+
+const runCommand = (command, args, cwd) =>
+  new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk;
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      resolve({
+        code,
+        stdout,
+        stderr,
+      });
+    });
+  });
 
 test('creates valid glob patterns for combined file groups', () => {
   assert.deepEqual(createGlobFileList(), []);
@@ -510,6 +537,201 @@ test('supports type-aware typescript rules inside vue script setup', async (t) =
     2,
   );
 });
+
+test('keeps no-unsafe rules enabled inside vue script setup', async (t) => {
+  const cwd = await createProject({
+    'tsconfig.json': JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          strict: true,
+        },
+        include: ['**/*.ts', '**/*.vue'],
+      },
+      null,
+      2,
+    ),
+    'Component.vue': `<script setup lang="ts">\nconst value: any = 1;\nconst obj = value;\nconst arr: string[] = [];\narr.push(value);\n</script>\n\n<template>\n  <div>{{ obj }}</div>\n</template>\n`,
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'Component.vue',
+    options: {
+      production: true,
+      tsParserOptions: {
+        projectService: true,
+        tsconfigRootDir: cwd,
+      },
+    },
+    configFactory: vueTypeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/no-unsafe-assignment')?.severity,
+    2,
+  );
+  assert.equal(
+    findRule(messages, '@typescript-eslint/no-unsafe-argument')?.severity,
+    2,
+  );
+});
+
+test('surfaces unresolved vue imports in type-aware typescript files', async (t) => {
+  const cwd = await createProject({
+    'tsconfig.json': JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          moduleResolution: 'Bundler',
+          strict: true,
+        },
+        include: ['src/**/*.ts', 'src/**/*.vue'],
+      },
+      null,
+      2,
+    ),
+    'src/App.vue': `<script setup lang="ts">\nconst message = 'hello';\n</script>\n\n<template>\n  <div>{{ message }}</div>\n</template>\n`,
+    'src/main.ts':
+      "import App from './App.vue';\nconst app = App;\nexport { app };\n",
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'src/main.ts',
+    options: {
+      production: true,
+      tsParserOptions: {
+        projectService: true,
+        tsconfigRootDir: cwd,
+      },
+    },
+    configFactory: vueTypeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/no-unsafe-assignment')?.severity,
+    2,
+  );
+});
+
+test('supports vue imports in type-aware typescript files with a module declaration', async (t) => {
+  const cwd = await createProject({
+    'tsconfig.json': JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          moduleResolution: 'Bundler',
+          strict: true,
+        },
+        include: ['src/**/*.ts', 'src/**/*.d.ts', 'src/**/*.vue'],
+      },
+      null,
+      2,
+    ),
+    'src/App.vue': `<script setup lang="ts">\nconst message = 'hello';\n</script>\n\n<template>\n  <div>{{ message }}</div>\n</template>\n`,
+    'src/env.d.ts':
+      "declare module '*.vue' {\n  const component: unknown;\n  export default component;\n}\n",
+    'src/main.ts':
+      "import App from './App.vue';\nconst app = App;\nexport { app };\n",
+  });
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const messages = await lintFile({
+    cwd,
+    filePath: 'src/main.ts',
+    options: {
+      production: true,
+      tsParserOptions: {
+        projectService: true,
+        tsconfigRootDir: cwd,
+      },
+    },
+    configFactory: vueTypeScriptConfig,
+  });
+
+  assert.equal(
+    findRule(messages, '@typescript-eslint/no-unsafe-assignment'),
+    undefined,
+  );
+});
+
+test(
+  'supports vue imports in type-aware typescript files with the vue typescript plugin',
+  { concurrency: false },
+  async (t) => {
+    const cwd = await createProject({
+      'tsconfig.json': JSON.stringify(
+        {
+          compilerOptions: {
+            target: 'ES2022',
+            module: 'ESNext',
+            moduleResolution: 'Bundler',
+            strict: true,
+            plugins: [{ name: '@vue/typescript-plugin' }],
+          },
+          include: ['src/**/*.ts', 'src/**/*.vue'],
+        },
+        null,
+        2,
+      ),
+      'src/App.vue': `<script setup lang="ts">\nconst message = 'hello';\n</script>\n\n<template>\n  <div>{{ message }}</div>\n</template>\n`,
+      'src/main.ts':
+        "import App from './App.vue';\nconst app = App;\nexport { app };\n",
+    });
+    t.after(() => rm(cwd, { recursive: true, force: true }));
+
+    const repoNodeModules = join('/home/matdr/eslint-config', 'node_modules');
+    await mkdir(join(cwd, 'node_modules', '@vue'), { recursive: true });
+    await symlink(
+      join(repoNodeModules, '@vue', 'typescript-plugin'),
+      join(cwd, 'node_modules', '@vue', 'typescript-plugin'),
+      'dir',
+    );
+    await symlink(
+      join(repoNodeModules, 'vue'),
+      join(cwd, 'node_modules', 'vue'),
+      'dir',
+    );
+    const resultPath = join(cwd, 'lint-result.json');
+
+    const result = await runCommand(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `import { ESLint } from 'eslint';
+import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { config as vueTypeScriptConfig } from '${join('/home/matdr/eslint-config', 'dist', 'vue-typescript.js')}';
+
+const eslint = new ESLint({
+  cwd: ${JSON.stringify(cwd)},
+  overrideConfigFile: true,
+  overrideConfig: vueTypeScriptConfig({
+    production: true,
+    tsParserOptions: {
+      projectService: true,
+      tsconfigRootDir: ${JSON.stringify(cwd)},
+    },
+  }),
+});
+
+const [result] = await eslint.lintFiles([join(${JSON.stringify(cwd)}, 'src/main.ts')]);
+await writeFile(${JSON.stringify(resultPath)}, JSON.stringify(result.messages));`,
+      ],
+      '/home/matdr/eslint-config',
+    );
+
+    assert.equal(result.code, 0, result.stderr || result.stdout);
+    assert.equal(await readFile(resultPath, 'utf8'), '[]');
+  },
+);
 
 test('ignores dist output when linting a type-aware project root', async (t) => {
   const cwd = await createProject({

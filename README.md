@@ -59,6 +59,30 @@ export default [
 ];
 ```
 
+For the best type-aware ESLint experience in Vue projects, install `@vue/typescript-plugin` and enable it in `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "plugins": [{ "name": "@vue/typescript-plugin" }]
+  }
+}
+```
+
+When `vue-typescript` is used with `projectService`, the config enables TypeScript plugin loading for ESLint automatically. That allows `.ts` files importing `.vue` to keep real component types instead of degrading to unsafe values.
+
+If your project does not use the Vue TypeScript plugin, keep a local declaration in `src/env.d.ts` as a fallback:
+
+```ts
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue';
+  const component: DefineComponent<Record<string, never>, Record<string, never>, unknown>;
+  export default component;
+}
+```
+
+`extraFileExtensions: ['.vue']` lets ESLint parse Vue SFCs, but by itself it does not replace TypeScript module resolution for imports that originate from regular `.ts` files.
+
 ### Vue
 
 ```mjs
@@ -122,6 +146,8 @@ Additional options:
 - Vue local development: `config({ production: false })`
 - Vue production builds: `config({ production: true })`
 - Vue + TypeScript production builds: `config({ production: true, tsParserOptions: { ... } })`
+
+For Vue + TypeScript projects, keep a local `*.vue` module declaration in a `.d.ts` file included by `tsconfig`.
 
 The config imports ignore patterns from the current project's `.gitignore` when that file exists and always ignores `dist`.
 
