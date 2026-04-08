@@ -354,6 +354,26 @@ test('keeps vue formatting rules compatible with prettier', async (t) => {
   });
 
   assert.equal(findRule(messages, 'vue/max-attributes-per-line'), undefined);
+  assert.equal(findRule(messages, 'vue/html-closing-bracket-newline'), undefined);
+  assert.equal(findRule(messages, 'vue/html-closing-bracket-spacing'), undefined);
+  assert.equal(findRule(messages, 'vue/html-comment-content-newline'), undefined);
+  assert.equal(findRule(messages, 'vue/html-comment-content-spacing'), undefined);
+  assert.equal(findRule(messages, 'vue/html-comment-indent'), undefined);
+  assert.equal(findRule(messages, 'vue/html-indent'), undefined);
+  assert.equal(findRule(messages, 'vue/html-quotes'), undefined);
+  assert.equal(
+    findRule(messages, 'vue/multiline-html-element-content-newline'),
+    undefined,
+  );
+  assert.equal(findRule(messages, 'vue/mustache-interpolation-spacing'), undefined);
+  assert.equal(findRule(messages, 'vue/no-multi-spaces'), undefined);
+  assert.equal(
+    findRule(messages, 'vue/no-spaces-around-equal-signs-in-attribute'),
+    undefined,
+  );
+  assert.equal(findRule(messages, 'vue/padding-line-between-tags'), undefined);
+  assert.equal(findRule(messages, 'vue/padding-lines-in-component-definition'), undefined);
+  assert.equal(findRule(messages, 'vue/singleline-html-element-content-newline'), undefined);
 });
 
 test('supports vue with typescript', async (t) => {
